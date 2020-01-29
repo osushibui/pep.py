@@ -29,15 +29,10 @@ class banchoConfig:
 		"""
 		(re)load bancho_settings from DB and set values in config array
 		"""
-		self.config["banchoMaintenance"] = generalUtils.stringToBool(glob.db.fetch("SELECT value_int FROM bancho_settings WHERE name = 'bancho_maintenance'")["value_int"])
-		self.config["freeDirect"] = generalUtils.stringToBool(glob.db.fetch("SELECT value_int FROM bancho_settings WHERE name = 'free_direct'")["value_int"])
-		mainMenuIcon = glob.db.fetch("SELECT file_id, url FROM main_menu_icons WHERE is_current = 1 LIMIT 1")
-		if mainMenuIcon is None:
-			self.config["menuIcon"] = ""
-		else:
-			imageURL = "https://i.ppy.sh/{}.png".format(mainMenuIcon["file_id"])
-			self.config["menuIcon"] = "{}|{}".format(imageURL, mainMenuIcon["url"])
-		self.config["loginNotification"] = glob.db.fetch("SELECT value_string FROM bancho_settings WHERE name = 'login_notification'")["value_string"]
+		self.config["banchoMaintenance"] = False
+		self.config["freeDirect"] = True
+		self.config["menuIcon"] = "https://i.ainu.pw/coolermaster.png|https://www.facebook.com/coolermasterthai"
+		self.config["loginNotification"] = ""
 
 
 	def setMaintenance(self, maintenance):
