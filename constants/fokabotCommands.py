@@ -1278,7 +1278,6 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 	rankType = message[0]
 	mapType = message[1]
 	mapID = message[2]
-	gameMode = message[3]
 
 	# Get persons userID, privileges, and token
 	userID = userUtils.getID(fro)
@@ -1295,18 +1294,6 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 		beatmapData = glob.db.fetch("SELECT beatmapset_id, song_name, ranked FROM beatmaps WHERE beatmap_id = {} LIMIT 1".format(mapID))
 	except:
 		return "We could not find that beatmap. Perhaps check you are using the BeatmapID (not BeatmapSetID), and typed it correctly."
-
-	# Handle gameMode
-	if 's' in gameMode.lower() or ('o' in gameMode.lower() and not 'm' in gameMode.lower() and not 'c' in gameMode.lower() and not 't' in gameMode.lower()):
-		gameMode = "osu!"
-	elif 'c' in gameMode.lower():
-		gameMode = "osu!catch"
-	elif 'm' in gameMode.lower():
-		gameMode = "osu!mania"
-	elif 't' in gameMode.lower():
-		gameMode = "osu!taiko"
-	else:
-		return "Please enter a valid gamemode (std, ctb, taiko, mania)."
 
 	if 's' in mapType.lower():
 		mapType = 'set'
@@ -1345,19 +1332,19 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 			glob.db.execute("UPDATE beatmaps SET ranked = {}, ranked_status_freezed = {}, rankedby = {} WHERE beatmap_id = {} LIMIT 1".format(rankTypeID, freezeStatus, userID, mapID ))
 
 		# Announce / Log to admin panel logs when ranked status is changed
-		log.rap(userID, "has {}ed beatmap ({}): {} ({}), on gamemode {}.".format(rankType, mapType, beatmapData["song_name"], mapID, gameMode), True)
+		log.rap(userID, "has {}ed beatmap ({}): {} ({})".format(rankType, mapType, beatmapData["song_name"], mapID), True)
 		if mapType.lower() == 'set':
-			msg = "{} has {}ed beatmap set: [https://osu.ppy.sh/s/{} {}] on gamemode {}".format(fro, rankType, beatmapData["beatmapset_id"], beatmapData["song_name"], gameMode)
+			msg = "{} has {}ed beatmap set: [https://osu.ppy.sh/s/{} {}]".format(fro, rankType, beatmapData["beatmapset_id"], beatmapData["song_name"])
 		else:
-			msg = "{} has {}ed beatmap: [https://osu.ppy.sh/s/{} {}] on gamemode {}".format(fro, rankType, mapID, beatmapData["song_name"], gameMode)
+			msg = "{} has {}ed beatmap: [https://osu.ppy.sh/s/{} {}]".format(fro, rankType, mapID, beatmapData["song_name"])
 
 		chat.sendMessage(glob.BOT_NAME, "#announce", msg)
 		if rankType == "love":
-			status = "Loved"
+			status = "loved"
 		elif rankType == "rank":
-			status = "Ranked"
+			status = "ranked"
 		else:
-			status = "Unranked"
+			status = "unranked"
 
 		if rankType == "love":
 			if mapType == "set":
@@ -1370,9 +1357,9 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 			else:
 				webhookdesp = "{} has been {}ed by {}".format(beatmapData["song_name"], rankType, name)
 
-		webhook = aobaHelper.Webhook(glob.conf.config["discord"]["ranked"], color=0xadd8e6, footer="This beatmap was ranked on osu!Ainu")
+		webhook = aobaHelper.Webhook(glob.conf.config["discord"]["ranked"], color=0xadd8e6, footer="This beatmap was {} on osu!Ainu".format(status))
 		webhook.set_author(name=name, icon='https://a.ainu.pw/{}'.format(str(userID)), url="https://ainu.pw/u/{}".format(str(userID)))
-		webhook.set_title(title="New {} Map!".format(status), url='https://osu.ppy.sh/s/{}'.format(str(beatmapData["beatmapset_id"])))
+		webhook.set_title(title="New {} map!".format(status), url='https://osu.ppy.sh/s/{}'.format(str(beatmapData["beatmapset_id"])))
 		webhook.set_desc(webhookdesp)
 		webhook.set_image("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".format(str(beatmapData["beatmapset_id"])))
 		webhook.post()
