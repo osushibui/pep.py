@@ -1346,16 +1346,10 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 		else:
 			status = "unranked"
 
-		if rankType == "love":
-			if mapType == "set":
-				webhookdesp = "{} (set) has been loved by {}".format(beatmapData["song_name"], name)
-			else:
-				webhookdesp = "{} has been loved by {}".format(beatmapData["song_name"], name)
+		if mapType == "set":
+			webhookdesp = "{} (set) has been {} by {}".format(beatmapData["song_name"], status, name)
 		else:
-			if mapType == "set":
-				webhookdesp = "{} (set) has been {}ed by {}".format(beatmapData["song_name"], rankType, name)
-			else:
-				webhookdesp = "{} has been {}ed by {}".format(beatmapData["song_name"], rankType, name)
+			webhookdesp = "{} has been {} by {}".format(beatmapData["song_name"], status, name)
 
 		webhook = aobaHelper.Webhook(glob.conf.config["discord"]["ranked"], color=0xadd8e6, footer="This beatmap was {} on osu!Ainu".format(status))
 		webhook.set_author(name=name, icon='https://a.ainu.pw/{}'.format(str(userID)), url="https://ainu.pw/u/{}".format(str(userID)))
