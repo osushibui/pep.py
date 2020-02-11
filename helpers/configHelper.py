@@ -75,6 +75,8 @@ class config:
 			parsedConfig.get("discord", "enable")
 			parsedConfig.get("discord", "boturl")
 			parsedConfig.get("discord", "devgroup")
+			parsedConfig.get("discord", "ranked")
+			parsedConfig.get("discord", "announcement")
 
 			parsedConfig.get("datadog", "enable")
 			parsedConfig.get("datadog", "apikey")
@@ -143,6 +145,8 @@ class config:
 		self.config.set("discord", "enable", "0")
 		self.config.set("discord", "boturl", "")
 		self.config.set("discord", "devgroup", "")
+		self.config.set("discord", "ranked", "")
+		self.config.set("discord", "announcement", "")
 
 		self.config.add_section("datadog")
 		self.config.set("datadog", "enable", "0")
