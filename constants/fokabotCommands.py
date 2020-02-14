@@ -1320,10 +1320,16 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 			freezeStatus = 0
 		else:
 			return "Please enter a valid ranked status (rank, love, unrank)."
-
+		
+		if rankType == "love":
+			status = "loved"
+		elif rankType == "rank":
+			status = "ranked"
+		else:
+			status = "unranked"
+		
 		if beatmapData['ranked'] == rankTypeID:
-			return "This map is already {}ed".format(rankType)
-
+			return "This map is already {}".format(status)
 
 		if mapType == 'set':
 			numDiffs = glob.db.fetch("SELECT COUNT(id) FROM beatmaps WHERE beatmapset_id = {}".format(beatmapData["beatmapset_id"]))
@@ -1332,20 +1338,14 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 			glob.db.execute("UPDATE beatmaps SET ranked = {}, ranked_status_freezed = {}, rankedby = {} WHERE beatmap_id = {} LIMIT 1".format(rankTypeID, freezeStatus, userID, mapID ))
 
 		# Announce / Log to admin panel logs when ranked status is changed
-		log.rap(userID, "has {}ed beatmap ({}): {} ({})".format(rankType, mapType, beatmapData["song_name"], mapID), True)
+		log.rap(userID, "has {} beatmap ({}): {} ({})".format(status, mapType, beatmapData["song_name"], mapID), True)
 		if mapType.lower() == 'set':
-			msg = "{} has {}ed beatmap set: [https://osu.ppy.sh/s/{} {}]".format(fro, rankType, beatmapData["beatmapset_id"], beatmapData["song_name"])
+			msg = "{} has {} beatmap set: [https://osu.ppy.sh/s/{} {}]".format(fro, status, beatmapData["beatmapset_id"], beatmapData["song_name"])
 		else:
-			msg = "{} has {}ed beatmap: [https://osu.ppy.sh/s/{} {}]".format(fro, rankType, mapID, beatmapData["song_name"])
+			msg = "{} has {} beatmap: [https://osu.ppy.sh/s/{} {}]".format(fro, status, mapID, beatmapData["song_name"])
 
 		chat.sendMessage(glob.BOT_NAME, "#announce", msg)
-		if rankType == "love":
-			status = "loved"
-		elif rankType == "rank":
-			status = "ranked"
-		else:
-			status = "unranked"
-
+		
 		if mapType == "set":
 			webhookdesp = "{} (set) has been {} by {}".format(beatmapData["song_name"], status, name)
 		else:
