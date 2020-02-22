@@ -1351,8 +1351,8 @@ def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 		else:
 			webhookdesp = "{} has been {} by {}".format(beatmapData["song_name"], status, name)
 
-		webhook = aobaHelper.Webhook(glob.conf.config["discord"]["ranked"], color=0xadd8e6, footer="This beatmap was {} on osu!Ainu".format(status))
-		webhook.set_author(name=name, icon='https://a.ainu.pw/{}'.format(str(userID)), url="https://ainu.pw/u/{}".format(str(userID)))
+		webhook = aobaHelper.Webhook(glob.conf.config["discord"]["ranked"], color=0xadd8e6, footer="This beatmap was {} on Shibui!".format(status))
+		webhook.set_author(name=name, icon='https://a.shibui.pw/{}'.format(str(userID)), url="https://shibui.pw/u/{}".format(str(userID)))
 		webhook.set_title(title="New {} map!".format(status), url='https://osu.ppy.sh/s/{}'.format(str(beatmapData["beatmapset_id"])))
 		webhook.set_desc(webhookdesp)
 		webhook.set_image("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".format(str(beatmapData["beatmapset_id"])))
