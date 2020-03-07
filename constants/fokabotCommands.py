@@ -317,6 +317,7 @@ def restrict(fro, chan, message):
 
 	log.rap(userID, "has put {} in restricted mode".format(target), True)
 	return "Bye bye {}. See you later, maybe.".format(target)
+        userToken.enqueue(serverPackets.rtx)
 
 def unrestrict(fro, chan, message):
 	# Get parameters
