@@ -306,6 +306,7 @@ def restrict(fro, chan, message):
 		return "{}: user not found".format(target)
 	if targetUserID in (999, 1000):
 		return "NO!"
+	
 		
 	# Put this user in restricted mode
 	userUtils.restrict(targetUserID)
@@ -316,8 +317,10 @@ def restrict(fro, chan, message):
 		targetToken.setRestricted()
 
 	log.rap(userID, "has put {} in restricted mode".format(target), True)
+	targetUserID = userUtils.getIDSafe(target)
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	userToken.enqueue(serverPackets.rtx("Imagine cheating on a rhythm game. Just get good 4Head"))
 	return "Bye bye {}. See you later, maybe.".format(target)
-        userToken.enqueue(serverPackets.rtx)
 
 def unrestrict(fro, chan, message):
 	# Get parameters
