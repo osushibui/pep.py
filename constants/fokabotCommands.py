@@ -275,8 +275,8 @@ def ban(fro, chan, message):
 	userID = userUtils.getID(fro)
 	if not targetUserID:
 		return "{}: user not found".format(target)
-	if targetUserID in (999, 1000):
-		return "NO!"
+	if targetUserID in (999, 1001, 1002):
+		return "nice try"
 	# Set allowed to 0
 	userUtils.ban(targetUserID)
 
@@ -331,7 +331,7 @@ def restrict(fro, chan, message):
 	userID = userUtils.getID(fro)
 	if not targetUserID:
 		return "{}: user not found".format(target)
-	if targetUserID in (999, 1002):
+	if targetUserID in (999, 1001, 1002):
 		return "nice try"
 	
 		
