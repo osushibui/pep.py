@@ -2,6 +2,7 @@ import json
 import random
 import re
 import threading
+from urllib.parse import urlencode
 
 import requests
 import time
@@ -268,13 +269,14 @@ def ban(fro, chan, message):
 	userUtils.ban(targetUserID)
 
 	# Send ban packet to the user if he's online
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
 	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
 	if targetToken is not None:
 		targetToken.enqueue(serverPackets.loginBanned())
-
+		userToken.enqueue(serverPackets.rtx("Really? You broke the rules SO badly we had to permanently ban you? Unfortunate. Goodbye."))
+	
 	log.rap(userID, "has banned {}".format(target), True)
 	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
-	userToken.enqueue(serverPackets.rtx("Really? You broke the rules SO badly we had to permanently ban you? Unfortunate. Goodbye."))
 	return "hahahhahah {} stink cheater lmaoooaoao".format(target)
 
 def unban(fro, chan, message):
@@ -292,6 +294,12 @@ def unban(fro, chan, message):
 	# Set allowed to 1
 	userUtils.unban(targetUserID)
 
+	# Send unrestricted mode packet to this user if he's online
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
+	if targetToken is not None:
+		userToken.enqueue(serverPackets.rtx("You're lucky to be back. Appreciate it and don't be a scum again."))
+
 	log.rap(userID, "has unbanned {}".format(target), True)
 	return "Welcome back {}!".format(target)
 
@@ -306,17 +314,19 @@ def restrict(fro, chan, message):
 	userID = userUtils.getID(fro)
 	if not targetUserID:
 		return "{}: user not found".format(target)
-	if targetUserID in (999, 1000):
-		return "NO!"
+	if targetUserID in (999, 1001, 1002):
+		return "nice try"
 	
 		
 	# Put this user in restricted mode
 	userUtils.restrict(targetUserID)
 
 	# Send restricted mode packet to this user if he's online
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
 	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
 	if targetToken is not None:
 		targetToken.setRestricted()
+		userToken.enqueue(serverPackets.rtx("Imagine cheating on a rhythm game. Just get good 4Head"))
 
 	log.rap(userID, "has put {} in restricted mode".format(target), True)
 	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
@@ -337,6 +347,12 @@ def unrestrict(fro, chan, message):
 
 	# Set allowed to 1
 	userUtils.unrestrict(targetUserID)
+
+	# Send unrestricted mode packet to this user if he's online
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
+	if targetToken is not None:
+		userToken.enqueue(serverPackets.rtx("Consider this your final chance. You don't wanna be banned, do you?"))
 
 	log.rap(userID, "has removed restricted mode from {}".format(target), True)
 	return "Welcome back {}!".format(target)
