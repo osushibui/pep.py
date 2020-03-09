@@ -71,6 +71,18 @@ def instantRestart(fro, chan, message):
 	systemHelper.scheduleShutdown(0, True, delay=5)
 	return False
 
+def rtx(fro, chan, message):
+	target = message[0]
+	message = " ".join(message[1:]).strip()
+	if not message:
+		return "Invalid message"
+	targetUserID = userUtils.getIDSafe(target)
+	if not targetUserID:
+		return "{}: user not found".format(target)
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	userToken.enqueue(serverPackets.rtx(message))
+	return ":ok_hand:"
+
 def faq(fro, chan, message):
 	# TODO: Unhardcode this
 	messages = {
@@ -273,8 +285,13 @@ def ban(fro, chan, message):
 	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
 	if targetToken is not None:
 		targetToken.enqueue(serverPackets.loginBanned())
-		userToken.enqueue(serverPackets.rtx("Really? You broke the rules SO badly we had to permanently ban you? Unfortunate. Goodbye."))
 	
+	# RTX
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
+	if targetToken is not None:
+		userToken.enqueue(serverPackets.rtx("Really? You broke the rules SO badly we had to permanently ban you? Unfortunate. Goodbye."))
+
 	log.rap(userID, "has banned {}".format(target), True)
 	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
 	return "hahahhahah {} stink cheater lmaoooaoao".format(target)
@@ -314,7 +331,7 @@ def restrict(fro, chan, message):
 	userID = userUtils.getID(fro)
 	if not targetUserID:
 		return "{}: user not found".format(target)
-	if targetUserID in (999, 1001, 1002):
+	if targetUserID in (999, 1002):
 		return "nice try"
 	
 		
@@ -322,11 +339,15 @@ def restrict(fro, chan, message):
 	userUtils.restrict(targetUserID)
 
 	# Send restricted mode packet to this user if he's online
-	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
 	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
 	if targetToken is not None:
 		targetToken.setRestricted()
-		userToken.enqueue(serverPackets.rtx("Imagine cheating on a rhythm game. Just get good 4Head"))
+
+	# RTX
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
+	if targetToken is not None:
+		userToken.enqueue(serverPackets.rtx("Consider this your final chance. You don't wanna be banned, do you?"))
 
 	log.rap(userID, "has put {} in restricted mode".format(target), True)
 	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
@@ -1280,18 +1301,6 @@ def switchServer(fro, chan, message):
 	# Disconnect the user from the origin server
 	# userToken.kick()
 	return "{} has been connected to {}".format(target, newServer)
-
-def rtx(fro, chan, message):
-	target = message[0]
-	message = " ".join(message[1:]).strip()
-	if not message:
-		return "Invalid message"
-	targetUserID = userUtils.getIDSafe(target)
-	if not targetUserID:
-		return "{}: user not found".format(target)
-	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
-	userToken.enqueue(serverPackets.rtx(message))
-	return ":ok_hand:"
 	
 def editMap(fro, chan, message): # Using Atoka's editMap with Aoba's edit
 	# Put the gathered values into variables to be used later
