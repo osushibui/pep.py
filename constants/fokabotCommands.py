@@ -275,7 +275,7 @@ def ban(fro, chan, message):
 	userID = userUtils.getID(fro)
 	if not targetUserID:
 		return "{}: user not found".format(target)
-	if targetUserID in (999):
+	if targetUserID in (999, 1001, 1002):
 		return "nice try"
 	# Set allowed to 0
 	userUtils.ban(targetUserID)
@@ -295,7 +295,7 @@ def ban(fro, chan, message):
 	log.rap(userID, "has banned {}".format(target), True)
 	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
 	return "hahahhahah {} stink cheater lmaoooaoao".format(target)
-
+		
 def unban(fro, chan, message):
 	# Get parameters
 	for i in message:
@@ -331,7 +331,7 @@ def restrict(fro, chan, message):
 	userID = userUtils.getID(fro)
 	if not targetUserID:
 		return "{}: user not found".format(target)
-	if targetUserID in (999):
+	if targetUserID in (999, 1001, 1002):
 		return "nice try"
 	
 		
@@ -353,6 +353,33 @@ def restrict(fro, chan, message):
 	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
 	userToken.enqueue(serverPackets.rtx("Imagine cheating on a rhythm game. Just get good 4Head"))
 	return "Bye bye {}. See you later, maybe.".format(target)
+
+def changeUsername(fro, chan, message):
+	target = message[0]
+	targetl = message[0].lower()
+	new = message[1]
+	newl = message[1].lower()
+	if not new:
+		return "Please give the replacement username"
+	if not target:
+		return "Please enter the player's current username"
+
+	targetUserID = userUtils.getIDSafe(target)
+
+	if not targetUserID:
+		return "{}: User not found".format(target)
+
+	targetToken = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True)
+	userToken = glob.tokens.getTokenFromUserID(targetUserID, ignoreIRC=True, _all=False)
+	tokens = glob.tokens.getTokenFromUsername(userUtils.safeUsername(target), safe=True, _all=True)
+	glob.db.execute("UPDATE `users`  SET `username` = '{}' WHERE `username` = '{}'".format(new, target))
+	glob.db.execute("UPDATE `users`  SET `username_safe` = '{}' WHERE `username_safe` = '{}'".format(newl, targetl))
+	glob.db.execute("UPDATE `users_stats` SET `username` = '{}' WHERE `username` = '{}'".format(new, target))
+	glob.db.execute("UPDATE `rx_stats` SET `username` = '{}' WHERE `username` = '{}'".format(new, target))
+	if targetToken is not None:
+		targetToken.enqueue(serverPackets.rtx("Your username has been changed. Please relog with your new username!  We automatically kicked you to ensure this name change happens smoothly."))
+	for i in tokens:
+		i.kick("Your username has been changed from {} to {}. Please relog!".format(target, new))
 
 def unrestrict(fro, chan, message):
 	# Get parameters
@@ -1601,10 +1628,10 @@ commands = [
 		"privileges": privileges.ADMIN_SILENCE_USERS,
 		"callback": silence
 	}, {
-		"trigger": "!removesilence",
+		"trigger": "!unsilence",
 		"syntax": "<target>",
 		"privileges": privileges.ADMIN_SILENCE_USERS,
-		"callback": removeSilence
+		"callback": unsilence
 	}, {
 		"trigger": "!system restart",
 		"privileges": privileges.ADMIN_MANAGE_SERVERS,
@@ -1692,6 +1719,11 @@ commands = [
 	}, {
 		"trigger": "!beatconnect",
 		"callback": beatconnect
+	}, {
+		"trigger": "!username",
+		"syntax": "<username> <new>",
+		"privileges": privileges.ADMIN_MANAGE_USERS,
+		"callback": changeUsername
 	}
 	#
 	#	"trigger": "!acc",
