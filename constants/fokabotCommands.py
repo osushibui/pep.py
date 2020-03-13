@@ -241,7 +241,7 @@ def silence(fro, chan, message):
 	msg = "{} has been silenced for the following reason: {}".format(target, reason)
 	return msg
 
-def removeSilence(fro, chan, message):
+def unsilence(fro, chan, message):
 	# Get parameters
 	for i in message:
 		i = i.lower()
@@ -262,7 +262,7 @@ def removeSilence(fro, chan, message):
 		# user offline, remove islene ofnlt from db
 		userUtils.silence(targetUserID, 0, "", userID)
 
-	return "{}'s silence reset".format(target)
+	return "{} has been unsilenced.".format(target)
 
 def ban(fro, chan, message):
 	# Get parameters
