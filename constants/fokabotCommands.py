@@ -1722,7 +1722,7 @@ commands = [
 	}, {
 		"trigger": "!username",
 		"syntax": "<username> <new>",
-		"privileges": privileges.ADMIN_MANAGE_USERS,
+		"privileges": privileges.USER_DONOR,
 		"callback": changeUsername
 	}
 	#
