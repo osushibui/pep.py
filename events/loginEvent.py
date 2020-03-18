@@ -121,7 +121,7 @@ def handle(tornadoRequest):
 			if expireDate-int(time.time()) <= 86400*3:
 				expireDays = round((expireDate-int(time.time()))/86400)
 				expireIn = "{} days".format(expireDays) if expireDays > 1 else "less than 24 hours"
-				responseToken.enqueue(serverPackets.notification("Your donor tag expires in {}! When your donor tag expires, you won't have any of the donor privileges, like yellow username, custom badge and discord custom role and username color! If you wish to keep supporting Ripple and you don't want to lose your donor privileges, you can donate again by clicking on 'Support us' on Ripple's website.".format(expireIn)))
+				responseToken.enqueue(serverPackets.notification("Your donor perks are about to run out in less than 24 hours! All perks associated with your donor perks will be gone within the next 24 hours. If you don't want this, you may want to buy donor again! However, if you are a staff member, ignore this message!".format(expireIn)))
 
 		# Deprecate telegram 2fa and send alert
 		if userUtils.deprecateTelegram2Fa(userID):
@@ -168,34 +168,24 @@ def handle(tornadoRequest):
 		# b20190326.2 = Ainu build 2 (MPGH PAGE 10)
 		# b20190401.22f56c084ba339eefd9c7ca4335e246f80 = Ainu Aoba's Birthday Build
 		# b20191223.3 = Unknown Ainu build? (Taken from most users osuver in cookiezi.pw)
-		# b20190226.2 = hqOsu (hq-af)
 		if glob.conf.extra["mode"]["anticheat"]:
 			# Ainu Client 2020 update
 			if tornadoRequest.request.headers.get("ainu") == "happy":
 				log.info("Account {} tried to use Ainu Client 2020!".format(userID))
 				if userUtils.isRestricted(userID):
-					responseToken.enqueue(serverPackets.notification("You're banned because you're currently using Ainu Client... Happy New Year 2020 and Enjoy your restriction :)"))
+					responseToken.enqueue(serverPackets.notification("fuck off thanks"))
 				else:
 					glob.tokens.deleteToken(userID)
-					userUtils.restrict(userID)
+					userUtils.ban(userID)
 					raise exceptions.loginCheatClientsException()
 			# Ainu Client 2019
 			elif aobaHelper.getOsuVer(userID) in ["0Ainu", "b20190326.2", "b20190401.22f56c084ba339eefd9c7ca4335e246f80", "b20191223.3"]:
 				log.info("Account {} tried to use Ainu Client!".format(userID))
 				if userUtils.isRestricted(userID):
-					responseToken.enqueue(serverPackets.notification("You're banned because you're currently using Ainu Client. Enjoy your restriction :)"))
+					responseToken.enqueue(serverPackets.notification("fuck off thanks"))
 				else:
 					glob.tokens.deleteToken(userID)
-					userUtils.restrict(userID)
-					raise exceptions.loginCheatClientsException()
-			# hqOsu
-			elif aobaHelper.getOsuVer(userID) == "b20190226.2":
-				log.info("Account {} tried to use hqOsu!".format(userID))
-				if userUtils.isRestricted(userID):
-					responseToken.enqueue(serverPackets.notification("Trying to use hqOsu in here? Well... No, sorry. We don't allow cheats here. Go play https://cookiezi.pw or others cheat server."))
-				else:
-					glob.tokens.deleteToken(userID)
-					userUtils.restrict(userID)
+					userUtils.ban(userID)
 					raise exceptions.loginCheatClientsException()
 
 		# Send all needed login packets
@@ -300,7 +290,7 @@ def handle(tornadoRequest):
 		# Using oldoldold client, we don't have client data. Force update.
 		# (we don't use enqueue because we don't have a token since login has failed)
 		responseData += serverPackets.forceUpdate()
-		responseData += serverPackets.notification("Hory shitto, your client is TOO old! Nice prehistory! Please turn update it from the settings!")
+		responseData += serverPackets.notification("Update your client! We aren't in 1990 mate.")
 	except:
 		log.error("Unknown error!\n```\n{}\n{}```".format(sys.exc_info(), traceback.format_exc()))
 	finally:
